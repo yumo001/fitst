@@ -17,6 +17,7 @@ func RegisterGrpg(port int, f func(ser *grpc.Server)) error {
 	server := grpc.NewServer()
 	//反射接口
 	reflection.Register(server)
+	f(server)
 
 	log.Println("创建rpc监听服务成功,监听端口:" + strconv.Itoa(port))
 
