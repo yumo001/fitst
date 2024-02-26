@@ -1,0 +1,5 @@
+{
+  "serverName": "pro_api",
+  "JWTSigningKey": "yumoskey",
+  "rpcServer" : "192.168.8.6:8080"
+}

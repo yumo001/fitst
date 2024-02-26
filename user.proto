@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package user;
+option go_package="./pb";
+
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+//用户
+message Users {
+  int64 id = 1;
+  string username = 2;
+  string password = 3;
+  string email = 4;
+  string tel = 5;
+}
+
+message RegisterRequest{
+  Users u =1;
+}
+message RegisterResponse{
+}
+
+message LoginRequest {
+  Users u =1;
+}
+message LoginResponse {
+  string token=3;
+}
+message ForgotPasswordRequest{
+  string username =1;
+}
+message ForgotPasswordResponse{
+
+}
+message ResetPasswordRequest{
+  string username = 1;
+  string password = 2;
+
+}
+message ResetPasswordResponse{
+
+}
+//商品
+message Goods{
+  string Id = 1;
+  string Name = 2;
+  string MarketPrice  = 3;  //市场价
+  string shopPrice = 4;  //现价
+
+}
+
+message UserListRequest{
+
+}
+message UserListResponse {
+  repeated Users us = 3;
+}
+
+service User {
+  rpc Ping(Request) returns(Response);
+  //注册
+  rpc Register(RegisterRequest)returns(RegisterResponse);
+  //登录
+  rpc Login(LoginRequest) returns(LoginResponse);
+  //密码找回
+  rpc ForgotPassword(ForgotPasswordRequest) returns(ForgotPasswordResponse);
+  //修改密码
+  rpc ResetPassword(ResetPasswordRequest) returns(ResetPasswordResponse);
+
+  //用户列表
+  rpc UserList(UserListRequest)returns(UserListResponse);
+
+  //商品列表
+//  rpc GoodsList()returns();
+
+}
+
+
