@@ -27,7 +27,7 @@ message UserRegisterResponse {
 }
 
 message UserLoginRequest {
-  string username = 1;
+  User u = 1;
 }
 message UserLoginResponse {
 }

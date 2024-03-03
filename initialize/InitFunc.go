@@ -55,9 +55,9 @@ func Viper() {
 			return
 		}
 		log.Println("rpc配置发生变动")
-		Mysql()
+		Nacos()
 	})
-	zap.S().Info("viper初始化完成")
+	log.Println("viper初始化完成")
 
 }
 
@@ -97,13 +97,11 @@ func Nacos() {
 	})
 	err = yaml.Unmarshal([]byte(content), &global.SevConf)
 	if err != nil {
-		fmt.Println(global.SevConf)
-		zap.S().Panic(err)
+		log.Fatal(err)
 		return
 	}
 	log.Println("nacos初始化完成")
-	fmt.Println(global.SevConf)
-
+	Mysql()
 }
 
 // 数据库初始化
@@ -115,7 +113,7 @@ func Mysql() {
 		return
 	}
 
-	zap.S().Info("数据库初始化完成")
+	log.Println("数据库初始化完成")
 }
 
 // consul健康检测服务
