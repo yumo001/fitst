@@ -3,9 +3,7 @@ package initialize
 //这是初始化文件
 
 import (
-	"encoding/json"
 	"fmt"
-	"gitee.com/yumo01/bag/global"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hashicorp/consul/api"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
@@ -13,24 +11,13 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
+
+	"github.com/yumo001/fitst/global"
 )
-
-// 初始化zap日志服务
-func Zap() {
-	////创建logger实例
-	Logger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
-	defer Logger.Sync()
-
-	//设置全局 Logger
-	zap.ReplaceGlobals(Logger)
-
-	zap.S().Info("初始化日志成功")
-}
 
 // 初始化配置文件读取
 func Viper() {
@@ -41,7 +28,7 @@ func Viper() {
 	//viper.AutomaticEnv()
 
 	//手动设置读取的文件路径
-	v.SetConfigFile("./conf/config.yaml")
+	v.SetConfigFile("./conf/conf.yaml")
 
 	//启用配置文件的动态监视,配置文件发生变化时自动重新加载配置
 	v.WatchConfig()
@@ -49,13 +36,13 @@ func Viper() {
 	//读取配置文件
 	err := v.ReadInConfig()
 	if err != nil {
-		zap.S().Panic("读取配置文件失败")
+		log.Fatal("读取配置文件失败")
 		return
 	}
 	//把读取的配置文件信息拿出来
 	err = v.Unmarshal(&global.SevConf)
 	if err != nil {
-		zap.S().Panic("解析yaml配置文件失败")
+		log.Fatal("解析yaml配置文件失败")
 		return
 	}
 
@@ -64,10 +51,10 @@ func Viper() {
 		//把读取的配置文件信息拿出来
 		err = v.Unmarshal(&global.SevConf)
 		if err != nil {
-			zap.S().Panic("解析yaml配置文件失败")
+			log.Fatal("解析yaml配置文件失败")
 			return
 		}
-		zap.S().Info("rpc配置发生变动")
+		log.Println("rpc配置发生变动")
 		Mysql()
 	})
 	zap.S().Info("viper初始化完成")
@@ -100,20 +87,22 @@ func Nacos() {
 		"clientConfig":  cc,
 	})
 	if err != nil {
-		zap.S().Panic(err)
+		log.Fatal(err)
 	}
 
 	//获取读取的
 	content, err := configClient.GetConfig(vo.ConfigParam{
 		DataId: global.SevConf.NacosConfig.ConfigParam.DataId,
-		Group:  global.SevConf.NacosConfig.ConfigParam.Group})
-
-	err = json.Unmarshal([]byte(content), &global.SevConf)
+		Group:  global.SevConf.NacosConfig.ConfigParam.Group,
+	})
+	err = yaml.Unmarshal([]byte(content), &global.SevConf)
 	if err != nil {
+		fmt.Println(global.SevConf)
 		zap.S().Panic(err)
 		return
 	}
-	zap.S().Info("nacos初始化完成")
+	log.Println("nacos初始化完成")
+	fmt.Println(global.SevConf)
 
 }
 

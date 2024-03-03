@@ -1,4 +1,4 @@
-serverName: pro_rpc
+serverName: bili_ser
 
 nacosConfig:
   ServerConfig:
@@ -7,7 +7,5 @@ nacosConfig:
   ClientConfig:
     NamespaceId: b2617e0b-4e3c-415c-9ea0-794fb9ce0386
   ConfigParam:
-    DataId: test1
-    Group: dev
-
-
+    DataId: bili
+    Group: imitations

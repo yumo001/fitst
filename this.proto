@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package this;
+option go_package="./pb";
+
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+message User {
+  int64 id = 1;
+  string username = 2;
+  string password = 3;
+  string email = 4;
+  string phone = 5;
+}
+
+message UserRegisterRequest {
+  User u = 1;
+}
+
+message UserRegisterResponse {
+}
+
+message UserLoginRequest {
+  string username = 1;
+}
+message UserLoginResponse {
+}
+
+service This {
+  rpc Ping(Request) returns(Response);
+
+  rpc Register(UserRegisterRequest)returns(UserRegisterResponse);
+
+  rpc Login(UserLoginRequest)returns(UserLoginResponse);
+}
