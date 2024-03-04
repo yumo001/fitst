@@ -15,6 +15,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"strconv"
 
 	"github.com/yumo001/fitst/global"
 )
@@ -90,7 +91,7 @@ func Nacos() {
 		log.Fatal(err)
 	}
 
-	//获取读取的
+	//读取配置
 	content, err := configClient.GetConfig(vo.ConfigParam{
 		DataId: global.SevConf.NacosConfig.ConfigParam.DataId,
 		Group:  global.SevConf.NacosConfig.ConfigParam.Group,
@@ -102,6 +103,62 @@ func Nacos() {
 	}
 	log.Println("nacos初始化完成")
 	Mysql()
+
+}
+
+// nacos服务发现
+func NacosServicesDiscovery(cc constant.ClientConfig, sc []constant.ServerConfig) {
+	//注册服务
+	nClient, err := clients.NewNamingClient(
+		vo.NacosClientParam{
+			ClientConfig:  &cc,
+			ServerConfigs: sc,
+		},
+	)
+
+	port, err := strconv.ParseUint(global.SevConf.RpcPort, 10, 64)
+	OK, err := nClient.RegisterInstance(vo.RegisterInstanceParam{
+		// 实例ID，如果不指定，则由 Nacos 自动生成
+		Ip: global.SevConf.NacosConfig.ClientConfig.NamespaceId,
+		// 实例端口
+		Port: port,
+		// 指定权重，用于负载均衡，默认值为 1。
+		Weight: 10,
+		// 是否启用临时实例，默认为 true。
+		Enable: true,
+		// 指定实例的健康状态，默认为 true。
+		Healthy: true,
+		// 健康检查端点，用于健康检查。
+		Metadata: map[string]string{},
+		// 指定集群名称，如果不指定则为默认值。
+		ClusterName: "Cluster1",
+		// 指定要注册的服务名。
+		ServiceName: global.SevConf.ServiceName,
+		//组名
+		GroupName: "GROUP1",
+		// 指定实例的上线状态，默认为 true
+		Ephemeral: true,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	if !OK {
+		log.Fatal("注册nacos服务失败")
+	}
+
+	//服务发现
+	_, err = nClient.SelectOneHealthyInstance(vo.SelectOneHealthInstanceParam{
+		//指定服务实例所属的集群名称
+		Clusters: []string{"Cluster1"},
+		//定了要选择健康服务实例的服务名
+		ServiceName: global.SevConf.ServiceName,
+		//指定了服务的分组名称
+		GroupName: "GROUP1",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 // 数据库初始化
@@ -113,7 +170,7 @@ func Mysql() {
 		return
 	}
 
-	log.Println("数据库初始化完成")
+	log.Println("mysql数据库初始化完成")
 }
 
 // consul健康检测服务
@@ -122,13 +179,12 @@ func Consul() {
 	conf := api.DefaultConfig()
 
 	//配置consul路由
-	conf.Address = "43.143.123.142:8500" //默认
+	conf.Address = "127.0.0.1:8500" //默认
 
 	//实例化客户端
 	client, err := api.NewClient(conf)
 	if err != nil {
-		zap.S().Panic(err)
-		return
+		log.Fatal(err)
 	}
 
 	//定义健康检查服务
@@ -141,10 +197,14 @@ func Consul() {
 
 	//srvId:=fmt.Sprintf("%s",uuid.NewV4())
 	//用于注册服务的结构体
+	port, err := strconv.Atoi(global.SevConf.RpcPort)
+	if err != nil {
+		log.Fatal("数据类型转换失败", err)
+	}
 	reg := api.AgentServiceRegistration{
 		Address: "10.2.171.69",
-		Port:    8080,
-		Name:    "first_srv",
+		Port:    port,
+		Name:    "first _srv",
 		//Tags:    []string{"tag1"},
 		ID:    "first_id", //若不填默认是Name
 		Check: check,
@@ -152,9 +212,9 @@ func Consul() {
 
 	err = client.Agent().ServiceRegister(&reg)
 	if err != nil {
-		zap.S().Panic(err)
+		log.Fatal(err)
 		return
 	}
 
-	zap.S().Info("consul注册服务成功")
+	log.Println("consul注册服务成功")
 }

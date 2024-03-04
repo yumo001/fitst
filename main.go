@@ -13,6 +13,7 @@ func init() {
 	log.Println("开始配置初始化......")
 	initialize.Viper()
 	initialize.Nacos()
+	initialize.Consul()
 	log.Println("配置初始化完成......")
 }
 
