@@ -11,6 +11,7 @@ message Response {
   string pong = 1;
 }
 
+//用户
 message User {
   int64 id = 1;
   string username = 2;
@@ -32,10 +33,20 @@ message UserLoginRequest {
 message UserLoginResponse {
 }
 
+message UserListRequest {
+  User u = 1;
+}
+message UserListResponse {
+  repeated User users = 1;
+}
+
+
 service This {
   rpc Ping(Request) returns(Response);
 
   rpc Register(UserRegisterRequest)returns(UserRegisterResponse);
 
   rpc Login(UserLoginRequest)returns(UserLoginResponse);
+
+  rpc List(UserListRequest) returns(UserListResponse);
 }

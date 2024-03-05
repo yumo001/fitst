@@ -101,6 +101,7 @@ func Nacos() {
 		log.Fatal(err)
 		return
 	}
+
 	log.Println("nacos初始化完成")
 	Mysql()
 
@@ -174,47 +175,54 @@ func Mysql() {
 }
 
 // consul健康检测服务
-func Consul() {
-	//创建默认客户端配置
-	conf := api.DefaultConfig()
-
-	//配置consul路由
-	conf.Address = "127.0.0.1:8500" //默认
-
-	//实例化客户端
-	client, err := api.NewClient(conf)
+func Consul(port string) {
+	// 创建连接consul服务配置
+	config := api.DefaultConfig()
+	config.Address = "localhost:8500"
+	//创建实例
+	client, err := api.NewClient(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("创建consul实例失败", err)
 	}
 
-	//定义健康检查服务
-	check := &api.AgentServiceCheck{
-		GRPC:                           "10.2.171.69:8080",
+	portInt, err := strconv.Atoi(port)
+	if err != nil {
+		log.Fatal("数据类型转换失败", err)
+	}
+	registration := api.AgentServiceRegistration{
+		ID:      "serviceId" + port,         // 服务节点的名称
+		Name:    global.SevConf.ServiceName, // 服务名称
+		Address: "10.2.171.69",              // 服务 IP 要确保consul可以访问这个ip
+		Port:    portInt,                    // 服务端口
+		//Tags:  []string{"go-consul-test"},// tag，可以为空
+	}
+
+	var check = api.AgentServiceCheck{
+		GRPC:                           fmt.Sprintf("%s:%d", registration.Address, registration.Port),
 		Timeout:                        "5s",
 		Interval:                       "5s",
 		DeregisterCriticalServiceAfter: "10s",
 	}
+	registration.Check = &check
 
-	//srvId:=fmt.Sprintf("%s",uuid.NewV4())
-	//用于注册服务的结构体
-	port, err := strconv.Atoi(global.SevConf.RpcPort)
+	// 注册服务到consul
+	err = client.Agent().ServiceRegister(&registration)
 	if err != nil {
-		log.Fatal("数据类型转换失败", err)
-	}
-	reg := api.AgentServiceRegistration{
-		Address: "10.2.171.69",
-		Port:    port,
-		Name:    "first _srv",
-		//Tags:    []string{"tag1"},
-		ID:    "first_id", //若不填默认是Name
-		Check: check,
+		log.Fatal("Consul注册失败")
 	}
 
-	err = client.Agent().ServiceRegister(&reg)
+	log.Println("consul服务注册完成")
+}
+
+// 注销服务
+func ConsulDeRegister() {
+	// 创建连接consul服务配置
+	config := api.DefaultConfig()
+	config.Address = "localhost:8500"
+	client, err := api.NewClient(config)
 	if err != nil {
-		log.Fatal(err)
-		return
+		log.Fatal("consul client error : ", err)
 	}
 
-	log.Println("consul注册服务成功")
+	client.Agent().ServiceDeregister("serviceId")
 }

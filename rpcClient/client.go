@@ -2,6 +2,8 @@ package rpcClient
 
 import (
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
@@ -16,6 +18,10 @@ func GrpcActivate(port string, f func(s *grpc.Server)) error {
 	}
 	//创建grpc服务器
 	s := grpc.NewServer()
+
+	//注册健康检测服务
+	healthcheck := health.NewServer()
+	healthpb.RegisterHealthServer(s, healthcheck)
 
 	//反射接口支持查询
 	reflection.Register(s)

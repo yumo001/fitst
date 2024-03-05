@@ -6,11 +6,12 @@ import (
 
 // 配置文件的映射结构
 type SeverConfig struct {
-	ServiceName string        `mapstructure:"serverName"`
-	RpcPort     string        `yaml:"rpc_port"`
-	NacosConfig NacosConfig   `mapstructure:"nacosConfig"`
-	Mysql       MysqlConfig   `yaml:"mysql"`
-	Elastic     ElasticConfig `yaml:"elastic"`
+	ServiceName   string        `mapstructure:"serverName"`
+	RpcPort       string        `yaml:"rpc_port"`
+	NacosConfig   NacosConfig   `mapstructure:"nacosConfig"`
+	Mysql         MysqlConfig   `yaml:"mysql"`
+	Elastic       ElasticConfig `yaml:"elastic"`
+	JwtSigningKey string        `yaml:"JwtSigningKey"`
 }
 
 type NacosConfig struct {

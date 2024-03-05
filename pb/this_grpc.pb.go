@@ -22,6 +22,7 @@ const (
 	This_Ping_FullMethodName     = "/this.This/Ping"
 	This_Register_FullMethodName = "/this.This/Register"
 	This_Login_FullMethodName    = "/this.This/Login"
+	This_List_FullMethodName     = "/this.This/List"
 )
 
 // ThisClient is the client API for This service.
@@ -31,6 +32,7 @@ type ThisClient interface {
 	Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Register(ctx context.Context, in *UserRegisterRequest, opts ...grpc.CallOption) (*UserRegisterResponse, error)
 	Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
+	List(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 }
 
 type thisClient struct {
@@ -68,6 +70,15 @@ func (c *thisClient) Login(ctx context.Context, in *UserLoginRequest, opts ...gr
 	return out, nil
 }
 
+func (c *thisClient) List(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
+	out := new(UserListResponse)
+	err := c.cc.Invoke(ctx, This_List_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ThisServer is the server API for This service.
 // All implementations must embed UnimplementedThisServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type ThisServer interface {
 	Ping(context.Context, *Request) (*Response, error)
 	Register(context.Context, *UserRegisterRequest) (*UserRegisterResponse, error)
 	Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
+	List(context.Context, *UserListRequest) (*UserListResponse, error)
 	mustEmbedUnimplementedThisServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedThisServer) Register(context.Context, *UserRegisterRequest) (
 }
 func (UnimplementedThisServer) Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedThisServer) List(context.Context, *UserListRequest) (*UserListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 func (UnimplementedThisServer) mustEmbedUnimplementedThisServer() {}
 
@@ -158,6 +173,24 @@ func _This_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _This_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ThisServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: This_List_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ThisServer).List(ctx, req.(*UserListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // This_ServiceDesc is the grpc.ServiceDesc for This service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +209,10 @@ var This_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _This_Login_Handler,
+		},
+		{
+			MethodName: "List",
+			Handler:    _This_List_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

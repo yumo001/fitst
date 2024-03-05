@@ -13,18 +13,23 @@ func init() {
 	log.Println("开始配置初始化......")
 	initialize.Viper()
 	initialize.Nacos()
-	initialize.Consul()
 	log.Println("配置初始化完成......")
 }
 
 func main() {
+	//go rpcClient.GrpcActivate("8081", func(s *grpc.Server) {
+	//	logic.RegisterGrpc(s)
+	//	initialize.Consul("8081")
+	//	log.Println("服务启动，监听端口:" + "8081" + "......")
+	//})
+
 	err := rpcClient.GrpcActivate(global.SevConf.RpcPort, func(s *grpc.Server) {
 		logic.RegisterGrpc(s)
+		initialize.Consul(global.SevConf.RpcPort)
 		log.Println("服务启动，监听端口:" + global.SevConf.RpcPort + "......")
 	})
 	if err != nil {
 		log.Println("")
 		panic(err)
 	}
-
 }

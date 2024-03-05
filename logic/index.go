@@ -43,8 +43,8 @@ func (ser SerS) Register(ctx context.Context, in *pb.UserRegisterRequest) (*pb.U
 	}
 
 	in.U.Password = fmt.Sprintf("%x", md5.Sum([]byte(in.U.Password)))
-	if global.MysqlDB.Table("users").Create(&in.U).Error != nil {
-		return &pb.UserRegisterResponse{}, status.Errorf(codes.Canceled, "创建用户失败")
+	if err := global.MysqlDB.Table("users").Create(&in.U).Error; err != nil {
+		return &pb.UserRegisterResponse{}, status.Errorf(codes.Canceled, "创建用户失败"+err.Error())
 	}
 	return nil, status.Errorf(codes.OK, "成功")
 }
@@ -68,4 +68,15 @@ func (ser SerS) Login(ctx context.Context, in *pb.UserLoginRequest) (*pb.UserLog
 	}
 
 	return &pb.UserLoginResponse{}, status.Errorf(codes.OK, "")
+}
+
+func (ser SerS) List(ctx context.Context, in *pb.UserListRequest) (*pb.UserListResponse, error) {
+
+	var us []*pb.User
+	if err := global.MysqlDB.Table("users").Where("username = ?", in.U.Username).Find(&us).Error; err != nil {
+		return &pb.UserListResponse{}, status.Errorf(codes.NotFound, "数据库查询失败"+err.Error())
+	}
+	return &pb.UserListResponse{
+		Users: us,
+	}, nil
 }

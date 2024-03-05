@@ -11,3 +11,4 @@ elastic:
   host: 43.143.123.142
   port: 9200
 
+JwtSigningKey: GanBei
