@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	This_Ping_FullMethodName     = "/this.This/Ping"
-	This_Register_FullMethodName = "/this.This/Register"
-	This_Login_FullMethodName    = "/this.This/Login"
-	This_List_FullMethodName     = "/this.This/List"
+	This_Ping_FullMethodName             = "/this.This/Ping"
+	This_Register_FullMethodName         = "/this.This/Register"
+	This_Login_FullMethodName            = "/this.This/Login"
+	This_List_FullMethodName             = "/this.This/List"
+	This_PasswordRecovery_FullMethodName = "/this.This/PasswordRecovery"
 )
 
 // ThisClient is the client API for This service.
@@ -33,6 +34,7 @@ type ThisClient interface {
 	Register(ctx context.Context, in *UserRegisterRequest, opts ...grpc.CallOption) (*UserRegisterResponse, error)
 	Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
 	List(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
+	PasswordRecovery(ctx context.Context, in *UserPasswordRecoveryRequest, opts ...grpc.CallOption) (*UserPasswordRecoveryResponse, error)
 }
 
 type thisClient struct {
@@ -79,6 +81,15 @@ func (c *thisClient) List(ctx context.Context, in *UserListRequest, opts ...grpc
 	return out, nil
 }
 
+func (c *thisClient) PasswordRecovery(ctx context.Context, in *UserPasswordRecoveryRequest, opts ...grpc.CallOption) (*UserPasswordRecoveryResponse, error) {
+	out := new(UserPasswordRecoveryResponse)
+	err := c.cc.Invoke(ctx, This_PasswordRecovery_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ThisServer is the server API for This service.
 // All implementations must embed UnimplementedThisServer
 // for forward compatibility
@@ -87,6 +98,7 @@ type ThisServer interface {
 	Register(context.Context, *UserRegisterRequest) (*UserRegisterResponse, error)
 	Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
 	List(context.Context, *UserListRequest) (*UserListResponse, error)
+	PasswordRecovery(context.Context, *UserPasswordRecoveryRequest) (*UserPasswordRecoveryResponse, error)
 	mustEmbedUnimplementedThisServer()
 }
 
@@ -105,6 +117,9 @@ func (UnimplementedThisServer) Login(context.Context, *UserLoginRequest) (*UserL
 }
 func (UnimplementedThisServer) List(context.Context, *UserListRequest) (*UserListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedThisServer) PasswordRecovery(context.Context, *UserPasswordRecoveryRequest) (*UserPasswordRecoveryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PasswordRecovery not implemented")
 }
 func (UnimplementedThisServer) mustEmbedUnimplementedThisServer() {}
 
@@ -191,6 +206,24 @@ func _This_List_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _This_PasswordRecovery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserPasswordRecoveryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ThisServer).PasswordRecovery(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: This_PasswordRecovery_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ThisServer).PasswordRecovery(ctx, req.(*UserPasswordRecoveryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // This_ServiceDesc is the grpc.ServiceDesc for This service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -213,6 +246,10 @@ var This_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _This_List_Handler,
+		},
+		{
+			MethodName: "PasswordRecovery",
+			Handler:    _This_PasswordRecovery_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

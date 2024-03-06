@@ -41,6 +41,13 @@ message UserListResponse {
 }
 
 
+message UserPasswordRecoveryRequest {
+  User u = 1;
+}
+message UserPasswordRecoveryResponse{
+  User u = 1;
+}
+
 service This {
   rpc Ping(Request) returns(Response);
 
@@ -49,4 +56,6 @@ service This {
   rpc Login(UserLoginRequest)returns(UserLoginResponse);
 
   rpc List(UserListRequest) returns(UserListResponse);
+
+  rpc PasswordRecovery(UserPasswordRecoveryRequest)returns(UserPasswordRecoveryResponse);
 }

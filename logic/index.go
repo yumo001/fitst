@@ -80,3 +80,15 @@ func (ser SerS) List(ctx context.Context, in *pb.UserListRequest) (*pb.UserListR
 		Users: us,
 	}, nil
 }
+
+func (ser SerS) PasswordRecovery(ctx context.Context, in *pb.UserPasswordRecoveryRequest) (*pb.UserPasswordRecoveryResponse, error) {
+
+	var u *pb.User
+	if err := global.MysqlDB.Table("users").Where("username = ?", in.U.Username).First(&u).Error; err != nil {
+		return &pb.UserPasswordRecoveryResponse{}, status.Errorf(codes.NotFound, "数据库查询失败"+err.Error())
+	}
+
+	return &pb.UserPasswordRecoveryResponse{
+		U: u,
+	}, status.Errorf(codes.OK, "")
+}

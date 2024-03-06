@@ -17,15 +17,9 @@ func init() {
 }
 
 func main() {
-	//go rpcClient.GrpcActivate("8081", func(s *grpc.Server) {
-	//	logic.RegisterGrpc(s)
-	//	initialize.Consul("8081")
-	//	log.Println("服务启动，监听端口:" + "8081" + "......")
-	//})
-
 	err := rpcClient.GrpcActivate(global.SevConf.RpcPort, func(s *grpc.Server) {
 		logic.RegisterGrpc(s)
-		initialize.Consul(global.SevConf.RpcPort)
+		//initialize.Consul(global.SevConf.RpcPort)
 		log.Println("服务启动，监听端口:" + global.SevConf.RpcPort + "......")
 	})
 	if err != nil {
