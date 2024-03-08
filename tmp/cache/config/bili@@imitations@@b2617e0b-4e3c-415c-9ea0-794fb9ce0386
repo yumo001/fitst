@@ -1,4 +1,4 @@
-rpc_port: 8080
+rpc_port: 8081
 
 mysql:
   root: root

@@ -101,8 +101,9 @@ func Nacos() {
 		log.Fatal(err)
 		return
 	}
-	//Mysql()
+
 	log.Println("nacos初始化完成")
+	Mysql()
 }
 
 // nacos服务发现
@@ -179,14 +180,14 @@ func Mysql2(f func(mysqlDB *gorm.DB) (interface{}, error)) {
 		return
 	}
 
-	f(mysqlDB)
-
 	db, err := mysqlDB.DB()
 	if err != nil {
 		log.Panic("获取数据库连接对象失败", err)
 		return
 	}
 	defer db.Close()
+
+	f(mysqlDB)
 }
 
 // consul健康检测服务

@@ -22,6 +22,7 @@ const (
 	This_Ping_FullMethodName             = "/this.This/Ping"
 	This_Register_FullMethodName         = "/this.This/Register"
 	This_Login_FullMethodName            = "/this.This/Login"
+	This_LoginByPhone_FullMethodName     = "/this.This/LoginByPhone"
 	This_List_FullMethodName             = "/this.This/List"
 	This_PasswordRecovery_FullMethodName = "/this.This/PasswordRecovery"
 )
@@ -33,6 +34,7 @@ type ThisClient interface {
 	Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Register(ctx context.Context, in *UserRegisterRequest, opts ...grpc.CallOption) (*UserRegisterResponse, error)
 	Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
+	LoginByPhone(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
 	List(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	PasswordRecovery(ctx context.Context, in *UserPasswordRecoveryRequest, opts ...grpc.CallOption) (*UserPasswordRecoveryResponse, error)
 }
@@ -72,6 +74,15 @@ func (c *thisClient) Login(ctx context.Context, in *UserLoginRequest, opts ...gr
 	return out, nil
 }
 
+func (c *thisClient) LoginByPhone(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error) {
+	out := new(UserLoginResponse)
+	err := c.cc.Invoke(ctx, This_LoginByPhone_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *thisClient) List(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
 	out := new(UserListResponse)
 	err := c.cc.Invoke(ctx, This_List_FullMethodName, in, out, opts...)
@@ -97,6 +108,7 @@ type ThisServer interface {
 	Ping(context.Context, *Request) (*Response, error)
 	Register(context.Context, *UserRegisterRequest) (*UserRegisterResponse, error)
 	Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
+	LoginByPhone(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
 	List(context.Context, *UserListRequest) (*UserListResponse, error)
 	PasswordRecovery(context.Context, *UserPasswordRecoveryRequest) (*UserPasswordRecoveryResponse, error)
 	mustEmbedUnimplementedThisServer()
@@ -114,6 +126,9 @@ func (UnimplementedThisServer) Register(context.Context, *UserRegisterRequest) (
 }
 func (UnimplementedThisServer) Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedThisServer) LoginByPhone(context.Context, *UserLoginRequest) (*UserLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginByPhone not implemented")
 }
 func (UnimplementedThisServer) List(context.Context, *UserListRequest) (*UserListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
@@ -188,6 +203,24 @@ func _This_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _This_LoginByPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ThisServer).LoginByPhone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: This_LoginByPhone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ThisServer).LoginByPhone(ctx, req.(*UserLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _This_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserListRequest)
 	if err := dec(in); err != nil {
@@ -242,6 +275,10 @@ var This_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _This_Login_Handler,
+		},
+		{
+			MethodName: "LoginByPhone",
+			Handler:    _This_LoginByPhone_Handler,
 		},
 		{
 			MethodName: "List",

@@ -55,6 +55,8 @@ service This {
 
   rpc Login(UserLoginRequest)returns(UserLoginResponse);
 
+  rpc LoginByPhone(UserLoginRequest)returns(UserLoginResponse);
+
   rpc List(UserListRequest) returns(UserListResponse);
 
   rpc PasswordRecovery(UserPasswordRecoveryRequest)returns(UserPasswordRecoveryResponse);
