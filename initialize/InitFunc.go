@@ -101,10 +101,8 @@ func Nacos() {
 		log.Fatal(err)
 		return
 	}
-
+	//Mysql()
 	log.Println("nacos初始化完成")
-	Mysql()
-
 }
 
 // nacos服务发现
@@ -170,8 +168,25 @@ func Mysql() {
 		zap.S().Panic("数据库连接失败", err)
 		return
 	}
+	log.Println("Mysql初始化完成")
+}
 
-	log.Println("mysql数据库初始化完成")
+func Mysql2(f func(mysqlDB *gorm.DB) (interface{}, error)) {
+	var err error
+	mysqlDB, err := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", global.SevConf.Mysql.Root, global.SevConf.Mysql.Password, global.SevConf.Mysql.Host, global.SevConf.Mysql.Port, global.SevConf.Mysql.Database)), &gorm.Config{})
+	if err != nil {
+		zap.S().Panic("数据库连接失败", err)
+		return
+	}
+
+	f(mysqlDB)
+
+	db, err := mysqlDB.DB()
+	if err != nil {
+		log.Panic("获取数据库连接对象失败", err)
+		return
+	}
+	defer db.Close()
 }
 
 // consul健康检测服务

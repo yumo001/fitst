@@ -5,10 +5,12 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/yumo001/fitst/global"
+	"github.com/yumo001/fitst/initialize"
 	"github.com/yumo001/fitst/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 // 创建本地服务结构体类型
@@ -34,19 +36,23 @@ func (ser SerS) Ping(ctx context.Context, in *pb.Request) (*pb.Response, error) 
 }
 
 func (ser SerS) Register(ctx context.Context, in *pb.UserRegisterRequest) (*pb.UserRegisterResponse, error) {
-	var count int64
-	if err := global.MysqlDB.Table("users").Where("username = ?", in.U.Username).Count(&count).Error; err != nil {
-		return &pb.UserRegisterResponse{}, status.Errorf(codes.NotFound, "数据库查询失败"+err.Error())
-	}
-	if count > 0 {
-		return &pb.UserRegisterResponse{}, status.Errorf(codes.AlreadyExists, "该用户已存在")
-	}
 
-	in.U.Password = fmt.Sprintf("%x", md5.Sum([]byte(in.U.Password)))
-	if err := global.MysqlDB.Table("users").Create(&in.U).Error; err != nil {
-		return &pb.UserRegisterResponse{}, status.Errorf(codes.Canceled, "创建用户失败"+err.Error())
-	}
-	return nil, status.Errorf(codes.OK, "成功")
+	initialize.Mysql2(func(mysqlDB *gorm.DB) (interface{}, error) {
+		var count int64
+		if err := mysqlDB.Table("users").Where("username = ?", in.U.Username).Count(&count).Error; err != nil {
+			return &pb.UserRegisterResponse{}, status.Errorf(codes.NotFound, "数据库查询失败"+err.Error())
+		}
+		if count > 0 {
+			return &pb.UserRegisterResponse{}, status.Errorf(codes.AlreadyExists, "该用户已存在")
+		}
+
+		in.U.Password = fmt.Sprintf("%x", md5.Sum([]byte(in.U.Password)))
+		if err := mysqlDB.Table("users").Create(&in.U).Error; err != nil {
+			return &pb.UserRegisterResponse{}, status.Errorf(codes.Canceled, "创建用户失败"+err.Error())
+		}
+		return nil, status.Errorf(codes.OK, "成功")
+	})
+	return nil, nil
 }
 
 func (ser SerS) Login(ctx context.Context, in *pb.UserLoginRequest) (*pb.UserLoginResponse, error) {
