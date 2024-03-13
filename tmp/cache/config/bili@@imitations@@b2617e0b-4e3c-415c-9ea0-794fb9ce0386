@@ -5,7 +5,7 @@ mysql:
   password: q025l6263
   host: 43.143.123.142
   port: 3306
-  database: 2107a
+  database: fbili
 
 elastic:
   host: 43.143.123.142

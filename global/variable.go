@@ -1,6 +1,7 @@
 package global
 
 import (
+	"github.com/olivere/elastic/v7"
 	"gorm.io/gorm"
 )
 
@@ -44,5 +45,6 @@ type ElasticConfig struct {
 var (
 	MysqlDB = &gorm.DB{}
 	// 配置文件结构体实例
-	SevConf = SeverConfig{}
+	SevConf       = SeverConfig{}
+	ElasticClient *elastic.Client
 )

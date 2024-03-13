@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package goods;
+option go_package="./";
+
+//商品
+message Good {
+  int64 id = 1;
+  string name = 2;
+  string image = 3;
+  string description = 4;
+  repeated Norm norm = 5;
+}
+//商品词条
+message Norm {
+  int64 id = 1;
+  int64 goodId = 2;
+  string name = 3;
+  repeated NormVal normVal = 4;
+}
+//商品词条值
+message NormVal{
+  int64 id = 1;
+  int64 NormId = 2;
+  string word = 3;
+
+  float price = 4;
+  int64 num = 5;
+}
+
+message SKU {
+  int64 id = 1;
+  Good good = 2;
+//  float price = 4;
+//  int64 num = 5;
+}
+
+message AddGoodRequest{
+  SKU sku =1;
+}
+message AddGoodResponse{
+}
+
+message DelGoodRequest{
+
+}
+message DelGoodResponse{
+}
+
+service Goods {
+    rpc AddGood(AddGoodRequest) returns (AddGoodResponse) {}
+    rpc DelGood(DelGoodRequest) returns (DelGoodResponse) {}
+
+}

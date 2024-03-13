@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package this;
-option go_package="./pb";
+option go_package="./";
 
 message Request {
   string ping = 1;
@@ -51,13 +51,13 @@ message UserPasswordRecoveryResponse{
 service This {
   rpc Ping(Request) returns(Response);
 
-  rpc Register(UserRegisterRequest)returns(UserRegisterResponse);
+  rpc UserRegister(UserRegisterRequest)returns(UserRegisterResponse);
 
-  rpc Login(UserLoginRequest)returns(UserLoginResponse);
+  rpc UserLogin(UserLoginRequest)returns(UserLoginResponse);
 
-  rpc LoginByPhone(UserLoginRequest)returns(UserLoginResponse);
+  rpc UserLoginByPhone(UserLoginRequest)returns(UserLoginResponse);
 
-  rpc List(UserListRequest) returns(UserListResponse);
+  rpc UserList(UserListRequest) returns(UserListResponse);
 
-  rpc PasswordRecovery(UserPasswordRecoveryRequest)returns(UserPasswordRecoveryResponse);
+  rpc UserPasswordRecovery(UserPasswordRecoveryRequest)returns(UserPasswordRecoveryResponse);
 }

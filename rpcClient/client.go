@@ -1,13 +1,22 @@
 package rpcClient
 
 import (
+	"github.com/yumo001/fitst/logic"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+
+	goods "github.com/yumo001/fitst/pb/goods"
+	user "github.com/yumo001/fitst/pb/user"
 )
+
+func RegisterGrpc(ser grpc.ServiceRegistrar) {
+	user.RegisterThisServer(ser, logic.UserServer{})
+	goods.RegisterGoodsServer(ser, logic.GoodsServer{})
+}
 
 func GrpcActivate(port string, f func(s *grpc.Server)) error {
 

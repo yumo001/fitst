@@ -5,19 +5,20 @@ package initialize
 import (
 	"fmt"
 	"github.com/fsnotify/fsnotify"
+	"github.com/google/uuid"
 	"github.com/hashicorp/consul/api"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"github.com/spf13/viper"
+	"github.com/yumo001/fitst/global"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"net"
 	"strconv"
-
-	"github.com/yumo001/fitst/global"
 )
 
 // 初始化配置文件读取
@@ -103,7 +104,6 @@ func Nacos() {
 	}
 
 	log.Println("nacos初始化完成")
-	Mysql()
 }
 
 // nacos服务发现
@@ -194,7 +194,8 @@ func Mysql2(f func(mysqlDB *gorm.DB) (interface{}, error)) {
 func Consul(port string) {
 	// 创建连接consul服务配置
 	config := api.DefaultConfig()
-	config.Address = "localhost:8500"
+	config.Address = "10.2.171.69:8500"
+
 	//创建实例
 	client, err := api.NewClient(config)
 	if err != nil {
@@ -206,9 +207,9 @@ func Consul(port string) {
 		log.Fatal("数据类型转换失败", err)
 	}
 	registration := api.AgentServiceRegistration{
-		ID:      "serviceId" + port,         // 服务节点的名称
+		ID:      uuid.New().String(),        // 服务节点的名称
 		Name:    global.SevConf.ServiceName, // 服务名称
-		Address: "10.2.171.69",              // 服务 IP 要确保consul可以访问这个ip
+		Address: GetIp()[0],                 // 服务 IP 要确保consul可以访问这个ip
 		Port:    portInt,                    // 服务端口
 		//Tags:  []string{"go-consul-test"},// tag，可以为空
 	}
@@ -228,6 +229,23 @@ func Consul(port string) {
 	}
 
 	log.Println("consul服务注册完成")
+}
+
+func GetIp() (ip []string) {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ip
+	}
+	for _, addr := range addrs {
+		ipNet, isVailIpNet := addr.(*net.IPNet)
+		if isVailIpNet && !ipNet.IP.IsLoopback() {
+			if ipNet.IP.To4() != nil {
+				ip = append(ip, ipNet.IP.String())
+			}
+		}
+
+	}
+	return ip
 }
 
 // 注销服务
