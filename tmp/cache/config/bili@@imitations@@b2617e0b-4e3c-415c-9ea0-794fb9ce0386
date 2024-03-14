@@ -12,3 +12,7 @@ elastic:
   port: 9200
 
 JwtSigningKey: GanBei
+
+consul: 
+  host: 10.2.171.69
+  port: 8500

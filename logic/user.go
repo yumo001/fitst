@@ -48,6 +48,27 @@ func (ser UserServer) UserRegister(ctx context.Context, in *user.UserRegisterReq
 
 func (ser UserServer) UserLogin(ctx context.Context, in *user.UserLoginRequest) (*user.UserLoginResponse, error) {
 	var count int64
+
+	//var err error
+	//initialize.Mysql2(func(mysqlDB *gorm.DB) error {
+	//	if err = mysqlDB.Table("users").Where("username = ?", in.U.Username).Count(&count).Error; err != nil {
+	//		return status.Errorf(codes.NotFound, "数据库查询失败"+err.Error())
+	//	}
+	//	if count <= 0 {
+	//		return status.Errorf(codes.NotFound, "该用户不存在")
+	//	}
+	//
+	//	in.U.Password = fmt.Sprintf("%x", md5.Sum([]byte(in.U.Password)))
+	//	var pp string
+	//	if err := mysqlDB.Table("users").Where("username = ?", in.U.Username).Pluck("password", &pp).Error; err != nil {
+	//		return status.Errorf(codes.NotFound, "数据库查询失败"+err.Error())
+	//	}
+	//	if in.U.Password != pp {
+	//		return status.Errorf(codes.Canceled, "密码错误")
+	//	}
+	//	return nil
+	//})
+
 	if err := global.MysqlDB.Table("users").Where("username = ?", in.U.Username).Count(&count).Error; err != nil {
 		return &user.UserLoginResponse{}, status.Errorf(codes.NotFound, "数据库查询失败"+err.Error())
 	}

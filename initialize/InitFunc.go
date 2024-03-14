@@ -172,29 +172,11 @@ func Mysql() {
 	log.Println("Mysql初始化完成")
 }
 
-func Mysql2(f func(mysqlDB *gorm.DB) (interface{}, error)) {
-	var err error
-	mysqlDB, err := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", global.SevConf.Mysql.Root, global.SevConf.Mysql.Password, global.SevConf.Mysql.Host, global.SevConf.Mysql.Port, global.SevConf.Mysql.Database)), &gorm.Config{})
-	if err != nil {
-		zap.S().Panic("数据库连接失败", err)
-		return
-	}
-
-	db, err := mysqlDB.DB()
-	if err != nil {
-		log.Panic("获取数据库连接对象失败", err)
-		return
-	}
-	defer db.Close()
-
-	f(mysqlDB)
-}
-
 // consul健康检测服务
 func Consul(port string) {
 	// 创建连接consul服务配置
 	config := api.DefaultConfig()
-	config.Address = "10.2.171.69:8500"
+	config.Address = global.SevConf.Consul.Host + ":" + global.SevConf.Consul.Port
 
 	//创建实例
 	client, err := api.NewClient(config)
@@ -258,5 +240,5 @@ func ConsulDeRegister() {
 		log.Fatal("consul client error : ", err)
 	}
 
-	client.Agent().ServiceDeregister("serviceId")
+	client.Agent().ServiceDeregister("douyin-1")
 }

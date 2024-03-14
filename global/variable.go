@@ -1,6 +1,7 @@
 package global
 
 import (
+	"github.com/go-redis/redis/v8"
 	"github.com/olivere/elastic/v7"
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ type SeverConfig struct {
 	Mysql         MysqlConfig   `yaml:"mysql"`
 	Elastic       ElasticConfig `yaml:"elastic"`
 	JwtSigningKey string        `yaml:"JwtSigningKey"`
+	Consul        Consul        `yaml:"consul"`
 }
 
 type NacosConfig struct {
@@ -42,9 +44,16 @@ type ElasticConfig struct {
 	Port string `yaml:"port"`
 }
 
+type Consul struct {
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
+}
+
 var (
-	MysqlDB = &gorm.DB{}
+
 	// 配置文件结构体实例
 	SevConf       = SeverConfig{}
 	ElasticClient *elastic.Client
+	MysqlDB       = &gorm.DB{}
+	RedisClient   = &redis.Client{}
 )
