@@ -46,9 +46,9 @@ func Mysql2(f func(mysqlDB *gorm.DB) error) {
 // redis
 func SendRedis() {
 	global.RedisClient = redis.NewClient(&redis.Options{
-		Addr:     "43.143.123.142:6379",
-		Password: "",
-		DB:       1,
+		Addr:     global.SevConf.Redis.Addr,
+		Password: global.SevConf.Redis.Password,
+		DB:       global.SevConf.Redis.DB,
 	})
 	defer global.RedisClient.Close()
 }

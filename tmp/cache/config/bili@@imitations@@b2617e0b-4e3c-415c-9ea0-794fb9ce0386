@@ -16,3 +16,8 @@ JwtSigningKey: GanBei
 consul: 
   host: 10.2.171.69
   port: 8500
+
+redis:
+  addr: 43.143.123.142
+  password: 
+  db: 4

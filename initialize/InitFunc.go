@@ -38,7 +38,7 @@ func Viper() {
 	//读取配置文件
 	err := v.ReadInConfig()
 	if err != nil {
-		log.Fatal("读取配置文件失败")
+		log.Fatal("读取配置文件失败", err)
 		return
 	}
 	//把读取的配置文件信息拿出来

@@ -15,6 +15,7 @@ type SeverConfig struct {
 	Elastic       ElasticConfig `yaml:"elastic"`
 	JwtSigningKey string        `yaml:"JwtSigningKey"`
 	Consul        Consul        `yaml:"consul"`
+	Redis         Redis         `yaml:"redis"`
 }
 
 type NacosConfig struct {
@@ -49,8 +50,13 @@ type Consul struct {
 	Port string `yaml:"port"`
 }
 
-var (
+type Redis struct {
+	Addr     string `yaml:"addr"`
+	Password string `yaml:"password"`
+	DB       int    `yaml:"db"`
+}
 
+var (
 	// 配置文件结构体实例
 	SevConf       = SeverConfig{}
 	ElasticClient *elastic.Client

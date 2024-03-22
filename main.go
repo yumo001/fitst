@@ -13,8 +13,8 @@ func init() {
 	initialize.Viper()
 	initialize.Nacos()
 	initialize.Mysql()
-	initialize.CreatElasticClient()
-	initialize.SynchronizationUser()
+	//initialize.CreatElasticClient()
+	//initialize.SynchronizationUser()
 	log.Println("配置初始化完成......")
 }
 
